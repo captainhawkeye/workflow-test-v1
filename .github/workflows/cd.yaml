@@ -1,0 +1,35 @@
+name: icp-tenant-ui-cd
+
+on:
+  # workflow_run:
+  #   workflows: ["icp-tenant-ui"]
+  #   types:
+  #     - completed
+  #   branches:
+  #     - pre-main
+  workflow_dispatch: {}
+  # push:
+  #   branches:
+  #     - pre-main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on:
+      - ubuntu-latest
+
+
+    strategy:
+      fail-fast: true
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Print
+      run: |
+        echo "Running in Main........"
