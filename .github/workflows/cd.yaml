@@ -6,8 +6,6 @@ on:
       - icp-tenant-ui
     types:
       - completed
-    branches:
-      - pre-main
   workflow_dispatch: {}
   # push:
   #   branches:
