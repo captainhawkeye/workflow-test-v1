@@ -1,15 +1,8 @@
 name: icp-tenant-ui-cd
 
 on:
-  workflow_run:
-    workflows:
-      - icp-tenant-ui
-    types:
-      - completed
+  workflow_call: {}
   workflow_dispatch: {}
-  # push:
-  #   branches:
-  #     - pre-main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
