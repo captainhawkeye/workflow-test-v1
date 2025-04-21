@@ -6,6 +6,10 @@ on:
       - pre-main
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   run-ci:
     uses: ./.github/workflows/ci.yaml
