@@ -1,11 +1,8 @@
-name: icp-tenant-ui-cd
+name: icp-tenant-ui-cd-non-prod
 
 on:
   workflow_dispatch: {}
-  workflow_run:
-    workflows: [icp-tenant-ui]
-    types: [completed]
-    branches: [non-prod]
+  workflow_call: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
