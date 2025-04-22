@@ -3,6 +3,9 @@ name: icp-tenant-ui
 on:
   workflow_call: {}
   workflow_dispatch: {}
+  push:
+    branches:
+      - non-prod
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
