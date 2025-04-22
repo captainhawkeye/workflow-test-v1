@@ -1,8 +1,6 @@
-name: icp-tenant-ui
+name: icp-tenant-ui-non-prod
 
 on:
-  workflow_call: {}
-  workflow_dispatch: {}
   push:
     branches:
       - non-prod
@@ -11,20 +9,23 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
-  deploy:
+  build:
     runs-on:
       - ubuntu-latest
-
 
     strategy:
       fail-fast: true
 
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
     steps:
     - name: Print
       run: |
-        echo "Running........"
+        echo "Building........"
+  deploy:
+    needs: build
+    if: ${{ github.ref == 'refs/heads/non-prod' }}
+    uses: ./.github/workflows/cd.yaml
