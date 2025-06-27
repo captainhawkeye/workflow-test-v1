@@ -1,0 +1,23 @@
+name: icp-tenant-ui-deploy
+
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.actor == 'captainhawkeye'
+    runs-on:
+      - ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Print
+      run: |
+        echo "Running in Main........"
