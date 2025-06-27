@@ -7,12 +7,29 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  ALLOWED_ACTORS: '["captainhawkeye1", "user2", "user3"]'
-
 jobs:
+  user-validation:
+    name: Validate GitHub Actor
+    runs-on: ubuntu-latest
+    outputs:
+      authorized: ${{ steps.check.outputs.authorized }}
+    steps:
+      - id: check
+        run: |
+          ACTOR="${{ github.actor }}"
+          ALLOWED='${{ vars.ALLOWED_ACTORS }}'
+
+          if echo "$ALLOWED" | jq -e ". | index(\"$ACTOR\")" > /dev/null; then
+            echo "✅ Authorized user: $ACTOR"
+            echo "authorized=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "❌ Unauthorized user: $ACTOR"
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+          fi
+
   deploy:
-    if: contains(fromJson(vars.ALLOWED_ACTORS), github.actor)
+    needs: user-validation
+    if: needs.user-validation.outputs.authorized == 'true'
     runs-on:
       - ubuntu-latest
 
@@ -24,12 +41,3 @@ jobs:
     - name: Print
       run: |
         echo "Running in Main with correct Actor........"
-
-  unauthorized:
-    name: Not Authorized
-    runs-on: ubuntu-latest
-    if: >
-      !contains(fromJson(vars.ALLOWED_ACTORS), github.actor)
-
-    steps:
-      - run: echo "❌ You are not authorized to deploy to Production."
