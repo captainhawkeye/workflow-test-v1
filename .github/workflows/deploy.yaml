@@ -9,7 +9,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.actor == 'captainhawkeye'
+    if: github.actor == 'captainhawkeye1'
     runs-on:
       - ubuntu-latest
 
@@ -20,4 +20,4 @@ jobs:
     steps:
     - name: Print
       run: |
-        echo "Running in Main........"
+        echo "Running in Main with correct Actor........"
