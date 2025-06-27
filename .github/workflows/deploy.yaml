@@ -12,7 +12,7 @@ env:
 
 jobs:
   deploy:
-    if: contains(fromJson(env.ALLOWED_ACTORS), github.actor)
+    if: contains(fromJson(vars.ALLOWED_ACTORS), github.actor)
     runs-on:
       - ubuntu-latest
 
@@ -29,7 +29,7 @@ jobs:
     name: Not Authorized
     runs-on: ubuntu-latest
     if: >
-      !contains(fromJson(env.ALLOWED_ACTORS), github.actor)
+      !contains(fromJson(vars.ALLOWED_ACTORS), github.actor)
 
     steps:
       - run: echo "❌ You are not authorized to deploy to Production."
