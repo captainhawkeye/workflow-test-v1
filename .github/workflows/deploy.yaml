@@ -7,9 +7,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  ALLOWED_ACTORS: '["captainhawkeye1", "user2", "user3"]'
+
 jobs:
   deploy:
-    if: contains(fromJson('["captainhawkeye1", "user2", "user3"]'), github.actor)
+    if: contains(fromJson(env.ALLOWED_ACTORS), github.actor)
     runs-on:
       - ubuntu-latest
 
@@ -26,7 +29,7 @@ jobs:
     name: Not Authorized
     runs-on: ubuntu-latest
     if: >
-      !contains(fromJson('["captainhawkeye1", "user2", "user3"]'), github.actor)
+      !contains(fromJson(env.ALLOWED_ACTORS), github.actor)
 
     steps:
       - run: echo "❌ You are not authorized to deploy to Production."
