@@ -9,7 +9,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: contains('captainhawkeye1,user2,user3', github.actor)
+    if: contains(fromJson('["captainhawkeye1", "user2", "user3"]'), github.actor)
     runs-on:
       - ubuntu-latest
 
@@ -25,7 +25,8 @@ jobs:
   unauthorized:
     name: Not Authorized
     runs-on: ubuntu-latest
-    if: "!contains('captainhawkeye1,user2,user3', github.actor)"
+    if: >
+      !contains(fromJson('["captainhawkeye1", "user2", "user3"]'), github.actor)
 
     steps:
       - run: echo "❌ You are not authorized to deploy to Production."
