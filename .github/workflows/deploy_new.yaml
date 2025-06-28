@@ -38,18 +38,39 @@ jobs:
       id-token: 'write'
 
     steps:
-    - name: Download artifact from build workflow
-      uses: actions/download-artifact@v4
-      with:
-        name: image-version
-        run-id: 15944548968
+    - name: Download artifact from previous run
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RUN_ID: 15944548968
+        ARTIFACT_NAME: image-version
+      run: |
+        echo "Fetching artifact list from run ID $RUN_ID"
+        ARTIFACTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          https://api.github.com/repos/${{ github.repository }}/actions/runs/$RUN_ID/artifacts)
+
+        ARTIFACT_ID=$(echo "$ARTIFACTS" | jq ".artifacts[] | select(.name==\"$ARTIFACT_NAME\") | .id")
+
+        if [ -z "$ARTIFACT_ID" ]; then
+          echo "❌ Artifact '$ARTIFACT_NAME' not found in run $RUN_ID"
+          exit 1
+        fi
+
+        echo "✅ Found artifact ID: $ARTIFACT_ID. Downloading..."
+
+        curl -L \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -o artifact.zip \
+          https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip
+
+        unzip artifact.zip
+
 
     - name: Read image version
       id: read_version
       run: |
         VERSION=$(cat image_version.txt)
         echo "IMAGE_VERSION=$VERSION"
-        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "VERSION=$IMAGE_VERSION" >> $GITHUB_OUTPUT
 
     - name: Deploy using image
       run: |
