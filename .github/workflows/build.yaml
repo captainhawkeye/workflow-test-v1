@@ -1,0 +1,56 @@
+name: build
+
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  user-validation:
+    name: Validate GitHub Actor
+    runs-on: ubuntu-latest
+    outputs:
+      authorized: ${{ steps.check.outputs.authorized }}
+    steps:
+      - id: check
+        run: |
+          ACTOR="${{ github.actor }}"
+          ALLOWED='${{ vars.ALLOWED_ACTORS }}'
+
+          if echo "$ALLOWED" | jq -e ". | index(\"$ACTOR\")" > /dev/null; then
+            echo "✅ Authorized user: $ACTOR"
+            echo "authorized=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "❌ Unauthorized user: $ACTOR"
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: user-validation
+    if: needs.user-validation.outputs.authorized == 'true'
+    runs-on:
+      - ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    outputs:
+      IMAGE_VERSION: ${{ steps.set-version.outputs.VERSION }}
+
+    steps:
+    - name: Image Version
+      id: set-version
+      run: |
+        VERSION=v$(date +"%Y%m%d%H%M%S")
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "$VERSION" > image_version.txt
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Upload image version
+      uses: actions/upload-artifact@v4
+      with:
+        name: image-version
+        path: image_version.txt
