@@ -41,7 +41,7 @@ jobs:
     - name: Download artifact from build workflow
       uses: actions/download-artifact@v4
       with:
-        name: image-version
+        artifact-ids: 3424656644
 
     - name: Read image version
       id: read_version
