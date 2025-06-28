@@ -42,6 +42,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: image-version
+        run-id: 15944548968
 
     - name: Read image version
       id: read_version
