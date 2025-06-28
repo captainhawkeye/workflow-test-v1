@@ -69,8 +69,8 @@ jobs:
       id: read_version
       run: |
         VERSION=$(cat image_version.txt)
-        echo "IMAGE_VERSION=$VERSION"
-        echo "VERSION=$IMAGE_VERSION" >> $GITHUB_ENV
+        echo "VERSION=$VERSION"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
 
     - name: Deploy using image
       run: |
