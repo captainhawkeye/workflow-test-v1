@@ -74,4 +74,4 @@ jobs:
 
     - name: Deploy using image
       run: |
-        echo "Deploying image with version ${{ steps.read_version.outputs.VERSION }}"
+        echo "Deploying image with version ${{ steps.read_version.outputs.IMAGE_VERSION }}"
