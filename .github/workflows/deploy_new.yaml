@@ -1,0 +1,55 @@
+name: deploy
+
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  user-validation:
+    name: Validate GitHub Actor
+    runs-on: ubuntu-latest
+    outputs:
+      authorized: ${{ steps.check.outputs.authorized }}
+    steps:
+      - id: check
+        run: |
+          ACTOR="${{ github.actor }}"
+          ALLOWED='${{ vars.ALLOWED_ACTORS }}'
+
+          if echo "$ALLOWED" | jq -e ". | index(\"$ACTOR\")" > /dev/null; then
+            echo "✅ Authorized user: $ACTOR"
+            echo "authorized=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "❌ Unauthorized user: $ACTOR"
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy:
+    needs: user-validation
+    if: needs.user-validation.outputs.authorized == 'true'
+    runs-on:
+      - ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Download artifact from build workflow
+      uses: actions/download-artifact@v4
+      with:
+        name: image-version
+
+    - name: Read image version
+      id: read_version
+      run: |
+        VERSION=$(cat image_version.txt)
+        echo "IMAGE_VERSION=$VERSION"
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Deploy using image
+      run: |
+        echo "Deploying image with version ${{ steps.read_version.outputs.VERSION }}"
