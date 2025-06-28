@@ -70,8 +70,8 @@ jobs:
       run: |
         VERSION=$(cat image_version.txt)
         echo "IMAGE_VERSION=$VERSION"
-        echo "VERSION=$IMAGE_VERSION" >> $GITHUB_OUTPUT
+        echo "VERSION=$IMAGE_VERSION" >> $GITHUB_ENV
 
     - name: Deploy using image
       run: |
-        echo "Deploying image with version ${{ steps.read_version.outputs.IMAGE_VERSION }}"
+        echo "Deploying image with version ${{ steps.read_version.outputs.VERSION }}"
